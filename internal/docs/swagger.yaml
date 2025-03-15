@@ -1,0 +1,107 @@
+basePath: /
+definitions:
+  entity.Competition:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      season:
+        type: integer
+    type: object
+  entity.Match:
+    properties:
+      awayTeam:
+        type: string
+      homeTeam:
+        type: string
+      score:
+        type: string
+    type: object
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: Christopher Fernandes
+  description: Competition API with auhtentication
+  termsOfService: http://swagger.io/terms/
+  title: API Rest Competition
+  version: "1.0"
+paths:
+  /api/v1/competitions:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista de competições disponíveis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Competition'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Obtém todas as competições
+      tags:
+      - Competitions
+  /api/v1/competitions/{id}/matches:
+    get:
+      consumes:
+      - application/json
+      description: Retorna as partidas de uma competição pelo ID, podendo filtrar
+        por rodada e equipe.
+      parameters:
+      - description: ID da Competição
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Número da Rodada
+        in: query
+        name: rodada
+        type: integer
+      - description: Nome da Equipe
+        in: query
+        name: equipe
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Match'
+            type: array
+        "400":
+          description: Erro nos parâmetros da requisição
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno do servidor
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retorna partidas de uma competição
+      tags:
+      - Competitions
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
