@@ -1,10 +1,12 @@
 version: "2"
 sql:
-- schema: "internal/infra/db/migrations"
-  queries: "internal/infra/db"
+- schema: "/migrations"
+  queries: "/queries"
   engine: "postgresql"
-  debug: true
   gen:
     go:
-      package: "db"
-      out: "internal/db"
+      package: "sqlc"
+      out: "../repository/sqlc"
+      overrides:
+        - column: "users.updated_at"
+          go_type: "time.Time"

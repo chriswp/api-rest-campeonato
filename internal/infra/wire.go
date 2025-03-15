@@ -5,11 +5,17 @@ package infra
 
 import (
 	"database/sql"
+	domainUseCase "github.com/chriswp/api-rest-campeonato/internal/domain/usecase"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/handler"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/repository"
 	"github.com/chriswp/api-rest-campeonato/internal/usecase"
 )
 import "github.com/google/wire"
+
+var AuthUseCaseSet = wire.NewSet(
+	usecase.NewAuthUseCase,
+	wire.Bind(new(domainUseCase.AuthUseCase), new(*usecase.AuthUseCaseImpl)),
+)
 
 var CompetitionUseCaseSet = wire.NewSet(
 	repository.NewCompetitionRepositoryImpl,

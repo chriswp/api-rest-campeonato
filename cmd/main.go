@@ -6,6 +6,7 @@ import (
 	config "github.com/chriswp/api-rest-campeonato/configs"
 	_ "github.com/chriswp/api-rest-campeonato/internal/docs"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/registry"
+	"github.com/chriswp/api-rest-campeonato/internal/usecase"
 	"log"
 )
 
@@ -33,6 +34,13 @@ func main() {
 			log.Println("Erro ao fechar conexão com o banco:", err)
 		}
 	}()
+
+	authUseCase := usecase.NewAuthUseCase(reg.UserRepo)
+	authMiddleware, err := config.NewAuthMiddleware(authUseCase)
+	if err != nil {
+		log.Fatal("Erro ao criar middleware JWT:", err)
+	}
+	config.Envs.TokenAuth = authMiddleware
 
 	server := api.NewAPIServer(":8080", reg)
 	if err := server.Run(); err != nil {
