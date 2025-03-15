@@ -113,6 +113,48 @@
                     }
                 }
             }
+        },
+        "/api/v1/login": {
+            "post": {
+                "description": "Autentica o usuário e retorna um token JWT para acesso às rotas protegidas.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Realiza o login do usuário",
+                "parameters": [
+                    {
+                        "description": "Dados de login",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token gerado com sucesso",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Usuário ou senha incorretos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -149,6 +191,19 @@
             "properties": {
                 "error": {
                     "type": "string"
+                }
+            }
+        },
+        "handler.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@test.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
                 }
             }
         }

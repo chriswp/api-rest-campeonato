@@ -24,7 +24,7 @@ func NewRegistry(ctx context.Context) (*Registry, error) {
 
 	return &Registry{
 		Database:        connectionDB,
-		UserRepo:        repositoryImpl.NewUserRepository(connectionDB),
+		UserRepo:        repositoryImpl.NewUserRepositoryImpl(connectionDB),
 		CompetitionRepo: repositoryImpl.NewCompetitionRepositoryImpl(),
 	}, nil
 }

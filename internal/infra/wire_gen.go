@@ -7,6 +7,7 @@
 package infra
 
 import (
+	"database/sql"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/handler"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/repository"
 	"github.com/chriswp/api-rest-campeonato/internal/usecase"
@@ -28,6 +29,15 @@ func NewCompetitionHandler() *handler.CompetitionHandler {
 	return competitionHandler
 }
 
+func NewUserHandler(db *sql.DB) *handler.UserHandler {
+	userRepository := repository.NewUserRepositoryImpl(db)
+	userUseCase := usecase.NewUserUseCase(userRepository)
+	userHandler := handler.NewUserHandler(userUseCase)
+	return userHandler
+}
+
 // wire.go:
 
 var CompetitionUseCaseSet = wire.NewSet(repository.NewCompetitionRepositoryImpl, usecase.NewCompetitionUsecase)
+
+var UserUseCaseSet = wire.NewSet(repository.NewUserRepositoryImpl, usecase.NewUserUseCase)

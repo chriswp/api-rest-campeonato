@@ -1,61 +1,39 @@
 package handler
 
 import (
-	"github.com/chriswp/api-rest-campeonato/internal/constants"
-	"github.com/chriswp/api-rest-campeonato/internal/domain/repository"
-	"github.com/chriswp/api-rest-campeonato/internal/dto"
+	config "github.com/chriswp/api-rest-campeonato/configs"
+	"github.com/chriswp/api-rest-campeonato/internal/usecase"
 	"github.com/gin-gonic/gin"
-	"github.com/go-chi/jwtauth"
-	"net/http"
-	"time"
 )
 
-type UserHandler struct {
-	UserRepository repository.UserRepository
+type LoginRequest struct {
+	Email    string `json:"email" example:"user@test.com"`
+	Password string `json:"password" example:"123456"`
 }
 
-func NewUserHandler() *UserHandler {
-	return &UserHandler{}
+type UserHandler struct {
+	UserUseCase *usecase.UserUseCase
+}
+
+func NewUserHandler(useCase *usecase.UserUseCase) *UserHandler {
+	return &UserHandler{UserUseCase: useCase}
 }
 
 func (h *UserHandler) RegisterRoutes(router *gin.RouterGroup) {
-	router.GET("/login", h.GetJWT)
+	router.POST("/login", h.Login)
+	router.GET("/refresh_token", config.Envs.TokenAuth.RefreshHandler)
 }
 
-func (h *UserHandler) GetJWT(c *gin.Context) {
-	jwt, ok := c.Value("jwt").(*jwtauth.JWTAuth)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.ErrJWTNotFound})
-		return
-	}
-
-	jwtExpiresIn, ok := c.Value("JwtExpiresIn").(int)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.ErrInvalidJwtExp})
-		return
-	}
-
-	var user dto.GetJWTInput
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": constants.ErrInvalidData})
-		return
-	}
-
-	u, err := h.UserRepository.FindUserByEmail(c, user.Email)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": constants.ErrUserNotFound})
-		return
-	}
-
-	if !u.CheckPassword(user.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": constants.ErrInvalidPassword})
-		return
-	}
-
-	_, tokenString, _ := jwt.Encode(map[string]interface{}{
-		"sub": u.ID.String(),
-		"exp": time.Now().Add(time.Second * time.Duration(jwtExpiresIn)).Unix(),
-	})
-
-	c.JSON(http.StatusOK, dto.GetJWTOutput{Token: tokenString})
+// Login realiza a autenticação do usuário e retorna um token JWT.
+// @Summary Realiza o login do usuário
+// @Description Autentica o usuário e retorna um token JWT para acesso às rotas protegidas.
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Dados de login"
+// @Success 200 {object} map[string]interface{} "Token gerado com sucesso"
+// @Failure 401 {object} map[string]interface{} "Usuário ou senha incorretos"
+// @Router /api/v1/login [post]
+func (h *UserHandler) Login(c *gin.Context) {
+	config.Envs.TokenAuth.LoginHandler(c)
 }

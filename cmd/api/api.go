@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/chriswp/api-rest-campeonato/internal/infra"
-	"github.com/chriswp/api-rest-campeonato/internal/infra/handler"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/registry"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -27,7 +26,7 @@ func (s *Server) Run() error {
 	router := gin.Default()
 	subrouter := router.Group("/api/v1")
 
-	userHandler := handler.NewUserHandler()
+	userHandler := infra.NewUserHandler(s.registry.Database)
 	userHandler.RegisterRoutes(subrouter)
 
 	competitionHandler := infra.NewCompetitionHandler()

@@ -23,6 +23,15 @@ definitions:
       error:
         type: string
     type: object
+  handler.LoginRequest:
+    properties:
+      email:
+        example: user@test.com
+        type: string
+      password:
+        example: "123456"
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -99,6 +108,35 @@ paths:
       summary: Retorna partidas de uma competição
       tags:
       - Competitions
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica o usuário e retorna um token JWT para acesso às rotas
+        protegidas.
+      parameters:
+      - description: Dados de login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token gerado com sucesso
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Usuário ou senha incorretos
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Realiza o login do usuário
+      tags:
+      - Auth
 securityDefinitions:
   ApiKeyAuth:
     in: header
