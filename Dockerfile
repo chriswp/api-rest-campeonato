@@ -1,5 +1,13 @@
 FROM golang:latest
 
-WORKDIR /app
+WORKDIR /go/src/app
 
-CMD ["tail", "-f", "/dev/null"]
+COPY . .
+
+RUN go mod tidy
+
+RUN go build -o main ./cmd
+
+EXPOSE 8080
+
+CMD ["./main"]

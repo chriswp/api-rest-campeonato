@@ -5,24 +5,10 @@ networks:
     external: true
 
 volumes:
-  local-database: {}
+  campeonato-database: {}
+  data: {}
 
 services:
-  db:
-    image: postgres:15-alpine
-    restart: 'no'
-    tty: true
-    ports:
-      - ${DB_EXTERNAL_PORT}:5432
-    volumes:
-      - local-database:/var/lib/postgresql/data
-      - ./internal/infra/db/migrations:/docker-entrypoint-initdb.d
-    environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_DB=${DB_DATABASE}
-    networks:
-      - local-network
   app:
     build: .
     depends_on:
@@ -30,7 +16,24 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./:/app
+      - .:/app
+      - ./data:/app/data
     networks:
       - local-network
+  db:
+    image: postgres:15-alpine
+    restart: 'no'
+    tty: true
+    ports:
+      - ${DB_EXTERNAL_PORT:-15433}:5432
+    volumes:
+      - campeonato-database:/var/lib/postgresql/data
+      - ./db/:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_DB=${DB_DATABASE}
+    networks:
+      - local-network
+
 
