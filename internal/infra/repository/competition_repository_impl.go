@@ -3,10 +3,8 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
-	config "github.com/chriswp/api-rest-campeonato/configs"
 	"github.com/chriswp/api-rest-campeonato/internal/constants"
 	"github.com/chriswp/api-rest-campeonato/internal/domain/entity"
-	"github.com/chriswp/api-rest-campeonato/internal/domain/repository"
 	"github.com/chriswp/api-rest-campeonato/internal/dto"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/http"
 	"github.com/chriswp/api-rest-campeonato/internal/utils"
@@ -15,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 type CompetitionRepositoryImpl struct {
@@ -24,15 +21,15 @@ type CompetitionRepositoryImpl struct {
 	httpClient http.HTTPClient
 }
 
-func NewCompetitionRepositoryImpl() repository.CompetitionRepository {
+func NewCompetitionRepositoryImpl(apiURL, token string, httpClient http.HTTPClient) *CompetitionRepositoryImpl {
 	return &CompetitionRepositoryImpl{
-		apiURL:     config.Envs.FootballAPIURL,
-		token:      config.Envs.FootballAPIToken,
-		httpClient: http.NewHTTPClient(5 * time.Second),
+		apiURL:     apiURL,
+		token:      token,
+		httpClient: httpClient,
 	}
 }
 
-func (r *CompetitionRepositoryImpl) fetchData(endpoint string, queryParams map[string]string) (*httpResponse.Response, error) {
+func (r *CompetitionRepositoryImpl) FetchData(endpoint string, queryParams map[string]string) (*httpResponse.Response, error) {
 	headers := map[string]string{
 		"Content-Type": "application/json",
 		"X-Auth-Token": r.token,
@@ -61,7 +58,7 @@ func (r *CompetitionRepositoryImpl) fetchData(endpoint string, queryParams map[s
 }
 
 func (r *CompetitionRepositoryImpl) GetCompetitions() (*[]entity.Competition, error) {
-	resp, err := r.fetchData("/competitions", nil)
+	resp, err := r.FetchData("/competitions", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +101,7 @@ func (r *CompetitionRepositoryImpl) GetMatchesByCompetition(id int, matchday *in
 		queryParams["matchday"] = strconv.Itoa(*matchday)
 	}
 
-	resp, err := r.fetchData(fmt.Sprintf("/competitions/%d/matches", id), queryParams)
+	resp, err := r.FetchData(fmt.Sprintf("/competitions/%d/matches", id), queryParams)
 	if err != nil {
 		return nil, err
 	}

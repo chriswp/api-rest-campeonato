@@ -8,23 +8,33 @@ package infra
 
 import (
 	"database/sql"
+	repository2 "github.com/chriswp/api-rest-campeonato/internal/domain/repository"
 	usecase2 "github.com/chriswp/api-rest-campeonato/internal/domain/usecase"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/handler"
+	"github.com/chriswp/api-rest-campeonato/internal/infra/http"
+	"github.com/chriswp/api-rest-campeonato/internal/infra/registry"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/repository"
 	"github.com/chriswp/api-rest-campeonato/internal/usecase"
 	"github.com/google/wire"
+	"os"
+	"time"
 )
 
 // Injectors from wire.go:
 
+func NewRegistry(db *sql.DB) (*registry.Registry, error) {
+	registryRegistry := ProvideRegistry(db)
+	return registryRegistry, nil
+}
+
 func NewCompetitionUseCase() *usecase.CompetitionUseCase {
-	competitionRepository := repository.NewCompetitionRepositoryImpl()
+	competitionRepository := ProvideCompetitionRepository()
 	competitionUseCase := usecase.NewCompetitionUsecase(competitionRepository)
 	return competitionUseCase
 }
 
 func NewCompetitionHandler() *handler.CompetitionHandler {
-	competitionRepository := repository.NewCompetitionRepositoryImpl()
+	competitionRepository := ProvideCompetitionRepository()
 	competitionUseCase := usecase.NewCompetitionUsecase(competitionRepository)
 	competitionHandler := handler.NewCompetitionHandler(competitionUseCase)
 	return competitionHandler
@@ -39,8 +49,32 @@ func NewUserHandler(db *sql.DB) *handler.UserHandler {
 
 // wire.go:
 
+func ProvideRegistry(db *sql.DB) *registry.Registry {
+	return &registry.Registry{
+		Database:        db,
+		UserRepo:        repository.NewUserRepositoryImpl(db),
+		CompetitionRepo: ProvideCompetitionRepository(),
+	}
+}
+
+func ProvideCompetitionRepository() repository2.CompetitionRepository {
+	apiURL := os.Getenv("FOOTBALL_API_URL")
+	token := os.Getenv("FOOTBALL_API_TOKEN")
+	httpClient := http.NewHTTPClient(5 * time.Second)
+
+	return repository.NewCompetitionRepositoryImpl(apiURL, token, httpClient)
+}
+
+var RegistrySet = wire.NewSet(
+	ProvideRegistry,
+	UserUseCaseSet,
+	CompetitionUseCaseSet,
+)
+
 var AuthUseCaseSet = wire.NewSet(usecase.NewAuthUseCase, wire.Bind(new(usecase2.AuthUseCase), new(*usecase.AuthUseCaseImpl)))
 
-var CompetitionUseCaseSet = wire.NewSet(repository.NewCompetitionRepositoryImpl, usecase.NewCompetitionUsecase)
+var CompetitionUseCaseSet = wire.NewSet(
+	ProvideCompetitionRepository, usecase.NewCompetitionUsecase,
+)
 
 var UserUseCaseSet = wire.NewSet(repository.NewUserRepositoryImpl, usecase.NewUserUseCase)
