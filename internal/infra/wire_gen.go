@@ -15,6 +15,7 @@ import (
 	"github.com/chriswp/api-rest-campeonato/internal/infra/registry"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/repository"
 	"github.com/chriswp/api-rest-campeonato/internal/usecase"
+	"github.com/chriswp/api-rest-campeonato/internal/usecase/validators"
 	"github.com/google/wire"
 	"os"
 	"time"
@@ -33,6 +34,13 @@ func NewCompetitionUseCase() *usecase.CompetitionUseCase {
 	return competitionUseCase
 }
 
+func NewFootballFanUseCase(db *sql.DB) *usecase.FootballFanUseCase {
+	footballFanRepository := ProvideFootballFanRepository(db)
+	footballFanValidator := ProvideFootballFanValidator(footballFanRepository)
+	footballFanUseCase := ProvideFootballFanUseCase(footballFanRepository, footballFanValidator)
+	return footballFanUseCase
+}
+
 func NewCompetitionHandler() *handler.CompetitionHandler {
 	competitionRepository := ProvideCompetitionRepository()
 	competitionUseCase := usecase.NewCompetitionUsecase(competitionRepository)
@@ -45,6 +53,14 @@ func NewUserHandler(db *sql.DB) *handler.UserHandler {
 	userUseCase := usecase.NewUserUseCase(userRepository)
 	userHandler := handler.NewUserHandler(userUseCase)
 	return userHandler
+}
+
+func NewFootballFanHandler(db *sql.DB) *handler.FootballFanHandler {
+	footballFanRepository := ProvideFootballFanRepository(db)
+	footballFanValidator := ProvideFootballFanValidator(footballFanRepository)
+	footballFanUseCase := ProvideFootballFanUseCase(footballFanRepository, footballFanValidator)
+	footballFanHandler := handler.NewFootballFanHandler(footballFanUseCase)
+	return footballFanHandler
 }
 
 // wire.go:
@@ -78,3 +94,21 @@ var CompetitionUseCaseSet = wire.NewSet(
 )
 
 var UserUseCaseSet = wire.NewSet(repository.NewUserRepositoryImpl, usecase.NewUserUseCase)
+
+var FootballFanUseCaseSet = wire.NewSet(
+	ProvideFootballFanRepository,
+	ProvideFootballFanValidator,
+	ProvideFootballFanUseCase,
+)
+
+func ProvideFootballFanRepository(db *sql.DB) repository2.FootballFanRepository {
+	return repository.NewFootballFanRepositoryImpl(db)
+}
+
+func ProvideFootballFanValidator(footballFanRepository repository2.FootballFanRepository) *validators.FootballFanValidator {
+	return validators.NewFootballFanValidator(footballFanRepository)
+}
+
+func ProvideFootballFanUseCase(footballFanRepository repository2.FootballFanRepository, validator *validators.FootballFanValidator) *usecase.FootballFanUseCase {
+	return usecase.NewFootballFanUseCase(footballFanRepository, validator)
+}

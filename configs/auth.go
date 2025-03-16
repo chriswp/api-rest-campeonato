@@ -27,10 +27,10 @@ func NewAuthMiddleware(authUseCase usecase.AuthUseCase) (*jwt.GinJWTMiddleware, 
 			}
 
 			if login.Email == "" {
-				return nil, fmt.Errorf(constants.FormatRequiredField("email"))
+				return nil, fmt.Errorf(constants.RequiredField("email"))
 			}
 			if login.Password == "" {
-				return nil, fmt.Errorf(constants.FormatRequiredField("password"))
+				return nil, fmt.Errorf(constants.RequiredField("password"))
 			}
 
 			userData, err := authUseCase.Authenticate(c.Request.Context(), login.Email, login.Password)

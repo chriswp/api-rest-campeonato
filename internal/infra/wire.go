@@ -12,6 +12,7 @@ import (
 	"github.com/chriswp/api-rest-campeonato/internal/infra/registry"
 	"github.com/chriswp/api-rest-campeonato/internal/infra/repository"
 	"github.com/chriswp/api-rest-campeonato/internal/usecase"
+	"github.com/chriswp/api-rest-campeonato/internal/usecase/validators"
 	"os"
 	"time"
 )
@@ -59,8 +60,31 @@ var UserUseCaseSet = wire.NewSet(
 	usecase.NewUserUseCase,
 )
 
+var FootballFanUseCaseSet = wire.NewSet(
+	ProvideFootballFanRepository,
+	ProvideFootballFanValidator,
+	ProvideFootballFanUseCase,
+)
+
+func ProvideFootballFanRepository(db *sql.DB) domainRepository.FootballFanRepository {
+	return repository.NewFootballFanRepositoryImpl(db)
+}
+
+func ProvideFootballFanValidator(footballFanRepository domainRepository.FootballFanRepository) *validators.FootballFanValidator {
+	return validators.NewFootballFanValidator(footballFanRepository)
+}
+
+func ProvideFootballFanUseCase(footballFanRepository domainRepository.FootballFanRepository, validator *validators.FootballFanValidator) *usecase.FootballFanUseCase {
+	return usecase.NewFootballFanUseCase(footballFanRepository, validator)
+}
+
 func NewCompetitionUseCase() *usecase.CompetitionUseCase {
 	wire.Build(CompetitionUseCaseSet)
+	return nil
+}
+
+func NewFootballFanUseCase(db *sql.DB) *usecase.FootballFanUseCase {
+	wire.Build(FootballFanUseCaseSet)
 	return nil
 }
 
@@ -78,4 +102,12 @@ func NewUserHandler(db *sql.DB) *handler.UserHandler {
 		handler.NewUserHandler,
 	)
 	return &handler.UserHandler{}
+}
+
+func NewFootballFanHandler(db *sql.DB) *handler.FootballFanHandler {
+	wire.Build(
+		FootballFanUseCaseSet,
+		handler.NewFootballFanHandler,
+	)
+	return &handler.FootballFanHandler{}
 }

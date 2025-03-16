@@ -10,3 +10,5 @@ sql:
       overrides:
         - column: "users.updated_at"
           go_type: "time.Time"
+        - column: "football_fans.updated_at"
+          go_type: "time.Time"

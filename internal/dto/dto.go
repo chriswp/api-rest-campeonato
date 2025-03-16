@@ -23,3 +23,9 @@ type MatchDTO struct {
 		} `json:"fullTime"`
 	} `json:"score"`
 }
+
+type CreateFootballFanDTO struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Team  string `json:"team"`
+}

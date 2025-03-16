@@ -32,6 +32,9 @@ func (s *Server) Run() error {
 	competitionHandler := infra.NewCompetitionHandler()
 	competitionHandler.RegisterRoutes(subrouter)
 
+	footballFanHandler := infra.NewFootballFanHandler(s.registry.Database)
+	footballFanHandler.RegisterRoutes(subrouter)
+
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	log.Println("Listening on", s.addr)

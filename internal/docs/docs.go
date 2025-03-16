@@ -125,6 +125,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/football-fan": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Cria um novo torcedor de futebol com os dados fornecidos e retorna o torcedor criado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FootballFan"
+                ],
+                "summary": "Cria um novo torcedor de futebol",
+                "parameters": [
+                    {
+                        "description": "Dados do Torcerdor de Futebol",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateFootballFanDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sucesso",
+                        "schema": {
+                            "$ref": "#/definitions/handler.FootballFanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Requisição inválida",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/login": {
             "post": {
                 "description": "Autentica o usuário e retorna um token JWT para acesso às rotas protegidas.",
@@ -169,6 +220,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.CreateFootballFanDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "team": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.Competition": {
             "type": "object",
             "properties": {
@@ -180,6 +245,29 @@ const docTemplate = `{
                 },
                 "season": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.FootballFan": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "team": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -201,6 +289,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.FootballFanResponse": {
+            "type": "object",
+            "properties": {
+                "fan": {
+                    "$ref": "#/definitions/entity.FootballFan"
+                },
+                "mensagem": {
                     "type": "string"
                 }
             }

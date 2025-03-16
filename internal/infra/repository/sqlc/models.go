@@ -10,6 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type FootballFan struct {
+	ID        uuid.UUID
+	Name      string
+	Email     string
+	Team      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type User struct {
 	ID        uuid.UUID
 	Name      string

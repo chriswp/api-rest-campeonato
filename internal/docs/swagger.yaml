@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  dto.CreateFootballFanDTO:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      team:
+        type: string
+    type: object
   entity.Competition:
     properties:
       id:
@@ -8,6 +17,21 @@ definitions:
         type: string
       season:
         type: integer
+    type: object
+  entity.FootballFan:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      team:
+        type: string
+      updated_at:
+        type: string
     type: object
   entity.Match:
     properties:
@@ -21,6 +45,13 @@ definitions:
   handler.ErrorResponse:
     properties:
       error:
+        type: string
+    type: object
+  handler.FootballFanResponse:
+    properties:
+      fan:
+        $ref: '#/definitions/entity.FootballFan'
+      mensagem:
         type: string
     type: object
   handler.LoginRequest:
@@ -110,6 +141,39 @@ paths:
       summary: Retorna partidas de uma competição
       tags:
       - Competitions
+  /api/v1/football-fan:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo torcedor de futebol com os dados fornecidos e retorna
+        o torcedor criado
+      parameters:
+      - description: Dados do Torcerdor de Futebol
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateFootballFanDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sucesso
+          schema:
+            $ref: '#/definitions/handler.FootballFanResponse'
+        "400":
+          description: Requisição inválida
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Cria um novo torcedor de futebol
+      tags:
+      - FootballFan
   /api/v1/login:
     post:
       consumes:

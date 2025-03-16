@@ -2,8 +2,18 @@ package constants
 
 import "fmt"
 
-const RequiredFieldError = "o campo '%s' é obrigatório"
+const RequiredFieldErrorMessage = "'%s' is required"
+const InvalidFieldErrorMessage = "invalid '%s' format"
+const IsAlreadyExistsMessage = "'%s' is already exists"
 
-func FormatRequiredField(field string) string {
-	return fmt.Sprintf(RequiredFieldError, field)
+func RequiredField(field string) string {
+	return fmt.Sprintf(RequiredFieldErrorMessage, field)
+}
+
+func InvalidFieldError(field string) string {
+	return fmt.Sprintf(InvalidFieldErrorMessage, field)
+}
+
+func IsAlreadyExists(field string) string {
+	return fmt.Sprintf(IsAlreadyExistsMessage, field)
 }
