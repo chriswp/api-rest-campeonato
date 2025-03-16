@@ -57,6 +57,11 @@ const docTemplate = `{
         },
         "/api/v1/competitions/{id}/matches": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retorna as partidas de uma competição pelo ID, podendo filtrar por rodada e equipe.",
                 "consumes": [
                     "application/json"

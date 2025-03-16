@@ -32,7 +32,7 @@ func (s *Server) Run() error {
 	competitionHandler := infra.NewCompetitionHandler()
 	competitionHandler.RegisterRoutes(subrouter)
 
-	subrouter.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	log.Println("Listening on", s.addr)
 	return http.ListenAndServe(s.addr, router)

@@ -105,6 +105,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Retorna partidas de uma competição
       tags:
       - Competitions

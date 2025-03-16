@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/chriswp/api-rest-campeonato/internal/constants"
+	"github.com/chriswp/api-rest-campeonato/internal/infra/middleware"
 	"github.com/chriswp/api-rest-campeonato/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -24,6 +25,7 @@ func NewCompetitionHandler(competitionUsecase *usecase.CompetitionUseCase) *Comp
 }
 
 func (h *CompetitionHandler) RegisterRoutes(router *gin.RouterGroup) {
+	router.Use(middleware.AuthMiddleware())
 	router.GET("/competitions", h.GetCompetitions)
 	router.GET("/competitions/:id/matches", h.GetMatchesByCompetitions)
 }
@@ -59,6 +61,7 @@ func (h *CompetitionHandler) GetCompetitions(c *gin.Context) {
 // @Success      200      {object}  []entity.Match
 // @Failure      400      {object}  map[string]string "Erro nos parâmetros da requisição"
 // @Failure      500      {object}  map[string]string "Erro interno do servidor"
+// @Security      ApiKeyAuth
 // @Router       /api/v1/competitions/{id}/matches [get]
 func (h *CompetitionHandler) GetMatchesByCompetitions(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
